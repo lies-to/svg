@@ -1,0 +1,49 @@
+/* Seasonal styles are scoped; the underlying app theme and layout remain intact. */
+:root.achroma-christmas {
+  --xmas-red:#d84b54; --xmas-deep:#8e2433; --xmas-green:#237b58;
+  --xmas-gold:#e8c77b; --xmas-cream:#fff8ed; --xmas-ink:#f8f4ee;
+}
+#achroma-xmas-snow{position:fixed;inset:0;pointer-events:none;z-index:9990;overflow:hidden}
+.xmas-flake{position:absolute;top:-28px;color:#fff;font-style:normal;font-size:12px;text-shadow:0 1px 5px #9fc5d8;animation:xmas-fall linear infinite}
+@keyframes xmas-fall{to{transform:translate3d(25px,110vh,0) rotate(360deg)}}
+.xmas-launcher{position:fixed;right:20px;bottom:20px;z-index:9992;border:1px solid #ffffff35;border-radius:999px;padding:11px 17px;background:linear-gradient(135deg,#a92e3e,#267653);color:#fff;font:600 13px/1.2 inherit;box-shadow:0 8px 30px #0004;cursor:pointer}
+.xmas-launcher:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.xmas-modal{position:fixed;inset:0;z-index:9995;display:none;align-items:center;justify-content:center;padding:18px;background:#080d0bbd;backdrop-filter:blur(8px)}
+.xmas-modal.visible{display:flex}
+.xmas-panel{width:min(680px,100%);max-height:min(850px,92vh);overflow:auto;border:1px solid #ffffff22;border-radius:22px;background:linear-gradient(145deg,#182b26,#101b19 70%);color:#f9f5ed;box-shadow:0 24px 90px #0009}
+.xmas-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:25px 26px 19px;background:radial-gradient(ellipse at 85% 0,#a532443b,transparent 60%)}
+.xmas-kicker{font-size:10px;letter-spacing:.2em;font-weight:800;color:#dfbd78}
+.xmas-head h2{font-size:25px;letter-spacing:-.04em;margin:7px 0 4px}
+.xmas-subtitle,.xmas-muted{color:#c2cec7;font-size:13px;line-height:1.55;margin:0}
+.xmas-close{border:0;background:#ffffff13;color:#fff;border-radius:10px;width:34px;height:34px;font-size:23px;cursor:pointer}
+.xmas-tabs{display:flex;gap:7px;padding:0 26px 17px;border-bottom:1px solid #ffffff17}
+.xmas-tabs button{border:1px solid #ffffff22;border-radius:999px;padding:9px 13px;background:transparent;color:#dce6df;font-size:12px;cursor:pointer}
+.xmas-tabs button.active{background:#e4c47c;color:#1b2923;border-color:#e4c47c;font-weight:700}
+.xmas-content{padding:22px 26px 25px;min-height:210px}
+.xmas-calendar-intro{margin-bottom:17px}.xmas-calendar-title{font-size:17px;font-weight:750;margin-bottom:5px}
+.xmas-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.xmas-gift{min-height:82px;border:1px solid #ffffff20;border-radius:13px;background:linear-gradient(150deg,#a63243,#752637);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:transform .16s,border-color .16s}
+.xmas-gift:nth-child(3n){background:linear-gradient(150deg,#287d59,#17533d)}
+.xmas-gift:nth-child(4n){background:linear-gradient(150deg,#b38a43,#735329)}
+.xmas-gift.today{outline:2px solid #f1d58d;outline-offset:2px;transform:translateY(-2px);box-shadow:0 5px 18px #e5c67c2c}
+.xmas-gift:disabled{cursor:default;opacity:.78}
+.xmas-gift.locked{background:#ffffff0b;color:#a8b5ad;border-style:dashed}
+.xmas-gift.skipped{background:#202b27;color:#7c8982}
+.xmas-gift.opened{background:#1d6649}
+.xmas-gift-number{font-size:17px;font-weight:800}.xmas-gift-icon{font-size:18px;line-height:1}
+.xmas-gift-label{font-size:9px;letter-spacing:.04em}
+.xmas-note{margin-top:16px;padding:12px 14px;border-radius:12px;background:#ffffff0b;color:#d3dcd5;font-size:12px;line-height:1.5}
+.xmas-foot{padding:13px 26px;border-top:1px solid #ffffff17;color:#aebdb4;font-size:10px;text-align:center}
+.xmas-loading,.xmas-error{padding:28px;text-align:center;color:#d4dfd7}.xmas-error{color:#ffb5b5}
+.xmas-reward{display:flex;gap:12px;align-items:center;padding:13px 15px;margin-bottom:17px;border:1px solid #e4c47c70;border-radius:13px;background:#e4c47c16;color:#fff2ce;font-size:13px}
+.xmas-reward-icon{font-size:22px;color:#e4c47c}
+.xmas-hunt-wrap h3{font-size:19px;margin:0 0 7px}
+.xmas-hunt-count{font-size:23px;font-weight:800;margin:22px 0 9px;color:#f0d38e}
+.xmas-meter{height:8px;background:#ffffff17;border-radius:99px;overflow:hidden}.xmas-meter span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#d64c57,#e8c77b,#299566);transition:width .25s}
+.xmas-cane{position:fixed;z-index:9991;width:35px;height:35px;border:1px solid #ffffff35;border-radius:50%;background:#9e293b;color:#fff;font-size:17px;box-shadow:0 5px 18px #0005;cursor:pointer;animation:xmas-pulse 2.2s infinite}
+.xmas-cane{transform:translate(-50%,-50%)}.xmas-cane:hover{transform:translate(-50%,-50%) scale(1.16)}
+@keyframes xmas-pulse{50%{box-shadow:0 0 0 7px #d64c5722,0 5px 18px #0005}}
+.xmas-name{color:var(--xmas-name-color,#e34b55)!important}
+.xmas-name-badge{display:inline-flex;align-items:center;justify-content:center;margin-left:5px;width:15px;height:15px;border-radius:50%;background:#e5c77e;color:#174c38;font-size:10px;vertical-align:middle}
+@media(max-width:520px){.xmas-panel{border-radius:17px}.xmas-head,.xmas-content{padding-left:17px;padding-right:17px}.xmas-tabs{padding-left:17px;padding-right:17px}.xmas-grid{gap:6px}.xmas-gift{min-height:68px;border-radius:10px}.xmas-gift-label{font-size:8px}.xmas-foot{padding:12px}}
+@media(prefers-reduced-motion:reduce){#achroma-xmas-snow{display:none}.xmas-cane{animation:none}.xmas-gift{transition:none}}
