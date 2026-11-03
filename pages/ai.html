@@ -16,64 +16,88 @@
   <link rel="stylesheet" crossorigin href="../assets/ai-ZQSPORdp.css">
   <link rel="stylesheet" crossorigin href="../assets/page-enter-DdmT-DPn.css">
   <link rel="stylesheet" crossorigin href="../assets/mobile-hxndgT7C.css">
-  <!-- ===================== CHRISTMAS TOUCHES (overlay only) ===================== -->
+
+  <!-- ===================== small xmas add-on ===================== -->
   <style id="xmas-theme">
-    :root { --xmas-red:#d42426; --xmas-red-dark:#7d0b0e; --xmas-gold:#ffd86b; }
-    ::selection { background: var(--xmas-red); color: #fff; }
-
-    /* Candy cane: text buttons + send button (JS adds .xmas-candy) */
+    /* Candy-cane border ring, drawn just outside the button */
     .xmas-candy {
-      background-color: var(--xmas-red) !important;
-      background-image: linear-gradient(45deg,
-        var(--xmas-red) 25%, #fff 25%, #fff 50%,
-        var(--xmas-red) 50%, var(--xmas-red) 75%, #fff 75%, #fff) !important;
-      background-size: 28px 28px !important;
-      color: #fff !important;
-      border: 2px solid #fff !important;
-      text-shadow: 0 0 3px var(--xmas-red-dark), 1px 1px 0 var(--xmas-red-dark), -1px -1px 0 var(--xmas-red-dark),
-                   1px -1px 0 var(--xmas-red-dark), -1px 1px 0 var(--xmas-red-dark);
-      box-shadow: 0 2px 0 var(--xmas-red-dark), 0 4px 10px rgba(0,0,0,.3);
+      position: relative;
+      isolation: isolate;
     }
-    .xmas-candy svg { filter: drop-shadow(0 0 2px var(--xmas-red-dark)); }
-
-    /* Hover effects on all buttons */
-    button { transition: transform .18s cubic-bezier(.3,1.6,.5,1), box-shadow .2s, filter .2s; }
-    button:not(:disabled):hover { transform: translateY(-1px) scale(1.05); filter: brightness(1.08); }
-    button:not(:disabled):active { transform: scale(.96); }
-    .xmas-candy:not(:disabled):hover {
-      animation: xmas-stripes .8s linear infinite, xmas-wiggle .45s ease-in-out;
-      box-shadow: 0 3px 0 var(--xmas-red-dark), 0 0 16px rgba(255,216,107,.65), 0 6px 14px rgba(0,0,0,.35);
+    .xmas-candy::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      padding: 2px;
+      border-radius: inherit;
+      background: repeating-linear-gradient(
+        -45deg,
+        #d42426 0 6px,
+        #ffffff 6px 12px
+      );
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+              mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      animation: xmas-candy-slide 0.9s linear infinite;
+      pointer-events: none;
+      z-index: -1;
     }
-    @keyframes xmas-stripes { to { background-position: 28px 0; } }
-    @keyframes xmas-wiggle { 0%,100%{rotate:0deg} 25%{rotate:-4deg} 50%{rotate:4deg} 75%{rotate:-2deg} }
-
-    a:hover { text-shadow: 0 0 8px rgba(255,216,107,.7); }
-    input:focus, textarea:focus {
-      box-shadow: 0 0 0 2px rgba(212,36,38,.55), 0 0 12px rgba(255,216,107,.45) !important;
+    @keyframes xmas-candy-slide {
+      to { background-position: 24px 0; }
     }
 
-    /* Santa hat on the send button */
-    .xmas-hat { position: relative; overflow: visible !important; }
-    .xmas-hat::before {
-      content: ""; position: absolute; top: -15px; left: -8px; width: 30px; height: 27px; z-index: 3;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M6 27 Q10 6 28 5 Q27 18 36 27Z' fill='%23d42426'/%3E%3Crect x='3' y='24' width='35' height='9' rx='4.5' fill='%23fff'/%3E%3Ccircle cx='29' cy='6' r='5' fill='%23fff'/%3E%3C/svg%3E") center / contain no-repeat;
-      transform: rotate(-18deg); transform-origin: 70% 90%; pointer-events: none;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.35));
+    /* Small Santa hat perched on the button */
+    .xmas-hat {
+      position: relative;
+      overflow: visible !important;
+    }
+    .xmas-hat::after {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      width: 22px;
+      height: 20px;
+      transform: translateX(-50%) rotate(-8deg);
+      transform-origin: 60% 100%;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M6 27 Q10 6 28 5 Q27 18 36 27Z' fill='%23d42426'/%3E%3Crect x='3' y='24' width='35' height='9' rx='4.5' fill='%23fff'/%3E%3Ccircle cx='29' cy='6' r='5' fill='%23fff'/%3E%3C/svg%3E") center/contain no-repeat;
+      pointer-events: none;
+      z-index: 5;
       transition: transform .25s cubic-bezier(.3,1.6,.5,1);
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));
     }
-    .xmas-hat:hover::before { transform: rotate(-6deg) translateY(-3px) scale(1.12); }
+    .xmas-hat:not(:disabled):hover::after {
+      transform: translateX(-50%) rotate(4deg) translateY(-2px);
+    }
 
-    /* Hover sparkles */
-    .xmas-spark {
-      position: fixed; z-index: 9995; pointer-events: none; line-height: 1; color: #fff;
-      text-shadow: 0 0 6px var(--xmas-gold), 0 0 12px var(--xmas-gold);
-      animation: xmas-spark .8s ease-out forwards;
+    /* Reindeer spinner (replaces the AI "thinking" spinner) */
+    @keyframes xmas-reindeer-spin { to { transform: rotate(360deg); } }
+
+    svg.xmas-reindeer {
+      background-color: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M9 6 L7 3 M7 3 L4 3 M7 3 L7 1 M7 3 L9 2'/%3E%3Cpath d='M15 6 L17 3 M17 3 L20 3 M17 3 L17 1 M17 3 L15 2'/%3E%3C/g%3E%3Cellipse cx='6' cy='9' rx='2' ry='1.3' transform='rotate(-30 6 9)' fill='white'/%3E%3Cellipse cx='18' cy='9' rx='2' ry='1.3' transform='rotate(30 18 9)' fill='white'/%3E%3Cpath d='M8 9 Q8 7 10 7 L14 7 Q16 7 16 9 L16 14 Q16 17 14 19 Q13 21 12 21 Q11 21 10 19 Q8 17 8 14 Z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
+              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M9 6 L7 3 M7 3 L4 3 M7 3 L7 1 M7 3 L9 2'/%3E%3Cpath d='M15 6 L17 3 M17 3 L20 3 M17 3 L17 1 M17 3 L15 2'/%3E%3C/g%3E%3Cellipse cx='6' cy='9' rx='2' ry='1.3' transform='rotate(-30 6 9)' fill='white'/%3E%3Cellipse cx='18' cy='9' rx='2' ry='1.3' transform='rotate(30 18 9)' fill='white'/%3E%3Cpath d='M8 9 Q8 7 10 7 L14 7 Q16 7 16 9 L16 14 Q16 17 14 19 Q13 21 12 21 Q11 21 10 19 Q8 17 8 14 Z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
     }
-    @keyframes xmas-spark {
-      0% { opacity: 1; transform: translate(0,0) scale(.4) rotate(0); }
-      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(180deg); }
+    svg.xmas-reindeer > * { display: none; }
+
+    .xmas-reindeer:not(svg) { position: relative; }
+    .xmas-reindeer:not(svg) > * { visibility: hidden; }
+    .xmas-reindeer:not(svg)::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M9 6 L7 3 M7 3 L4 3 M7 3 L7 1 M7 3 L9 2'/%3E%3Cpath d='M15 6 L17 3 M17 3 L20 3 M17 3 L17 1 M17 3 L15 2'/%3E%3C/g%3E%3Cellipse cx='6' cy='9' rx='2' ry='1.3' transform='rotate(-30 6 9)' fill='white'/%3E%3Cellipse cx='18' cy='9' rx='2' ry='1.3' transform='rotate(30 18 9)' fill='white'/%3E%3Cpath d='M8 9 Q8 7 10 7 L14 7 Q16 7 16 9 L16 14 Q16 17 14 19 Q13 21 12 21 Q11 21 10 19 Q8 17 8 14 Z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
+              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M9 6 L7 3 M7 3 L4 3 M7 3 L7 1 M7 3 L9 2'/%3E%3Cpath d='M15 6 L17 3 M17 3 L20 3 M17 3 L17 1 M17 3 L15 2'/%3E%3C/g%3E%3Cellipse cx='6' cy='9' rx='2' ry='1.3' transform='rotate(-30 6 9)' fill='white'/%3E%3Cellipse cx='18' cy='9' rx='2' ry='1.3' transform='rotate(30 18 9)' fill='white'/%3E%3Cpath d='M8 9 Q8 7 10 7 L14 7 Q16 7 16 9 L16 14 Q16 17 14 19 Q13 21 12 21 Q11 21 10 19 Q8 17 8 14 Z' fill='white'/%3E%3C/svg%3E") center/contain no-repeat;
+      animation: xmas-reindeer-spin 1.4s linear infinite;
+      pointer-events: none;
     }
-    @media (prefers-reduced-motion: reduce) { .xmas-candy:hover { animation: none !important; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .xmas-candy::before { animation: none; }
+      .xmas-reindeer:not(svg)::after { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -89,65 +113,77 @@
   <script>window.lucide||document.write('<script src="https://jsd.onmicrosoft.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://jsd.liiiu.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://cdn.statically.io/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
-  <!-- ===================== CHRISTMAS TOUCHES SCRIPT ===================== -->
+
+  <!-- ===================== small xmas add-on script ===================== -->
   <script id="xmas-script">
   (function () {
-    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var SEND = /send|submit|arrow-up|paper-?plane/i;
+    var sendRe  = /send|submit|arrow-?up|paper-?plane/i;
+    var candyRe = /send|submit|arrow-?up|paper-?plane|regenerate|retry|try.?again|new.?chat/i;
 
-    function isSend(b) {
-      if (b.type === 'submit') return true;
-      var attrs = [b.getAttribute('aria-label'), b.title, b.id, b.className && b.className.baseVal === undefined ? b.className : '',
-                   b.getAttribute('data-testid'), b.getAttribute('data-icon')].join(' ');
-      if (SEND.test(attrs)) return true;
-      var svg = b.querySelector('svg');
-      return !!(svg && SEND.test((svg.getAttribute('class') || '') + ' ' + (svg.getAttribute('data-lucide') || '')));
+    function labelOf(b) {
+      return [
+        b.getAttribute('aria-label') || '',
+        b.title || '',
+        b.id || '',
+        typeof b.className === 'string' ? b.className : '',
+        b.getAttribute('data-testid') || ''
+      ].join(' ');
     }
 
-    function decorate() {
-      var btns = document.querySelectorAll('button');
-      for (var i = 0; i < btns.length; i++) {
-        var b = btns[i];
-        if (b.classList.contains('xmas-skip')) continue;
-        var send = isSend(b);
-        var hasText = b.textContent.trim().length > 0;
-        // only one hat: the send button closest to a text box
-        if (send) b.classList.add('xmas-hat');
-        if (send || hasText) b.classList.add('xmas-candy');
+    function isSendButton(b) {
+      if (b.type === 'submit') return true;
+      if (sendRe.test(labelOf(b))) return true;
+      var svg = b.querySelector('svg');
+      return !!(svg && sendRe.test((svg.getAttribute('class') || '') + ' ' +
+                                    (svg.getAttribute('data-lucide') || '')));
+    }
+
+    function decorateButtons() {
+      document.querySelectorAll('button').forEach(function (b) {
+        if (b.dataset.xmasDone) return;
+        b.dataset.xmasDone = '1';
+        var label = labelOf(b);
+        if (isSendButton(b) || candyRe.test(label)) {
+          b.classList.add('xmas-candy');
+          b.classList.add('xmas-hat');
+        }
+      });
+    }
+
+    function decorateSpinner(el) {
+      if (el.dataset.xmasReindeer) return;
+      var svg = el.tagName === 'svg' ? el : el.querySelector('svg');
+      if (svg) {
+        svg.classList.add('xmas-reindeer');
+        svg.dataset.xmasReindeer = '1';
+      } else {
+        el.classList.add('xmas-reindeer');
+        el.dataset.xmasReindeer = '1';
       }
+      if (el.tagName !== 'svg') el.dataset.xmasReindeer = '1';
+    }
+
+    function findSpinners() {
+      // Tailwind "animate-spin" (typical loading icon)
+      document.querySelectorAll('.animate-spin').forEach(decorateSpinner);
+      // Common "thinking" / "loading" hints
+      document.querySelectorAll('[role="status"], [data-testid*="loading" i], [data-testid*="spinner" i], [data-testid*="thinking" i], [data-testid*="typing" i]')
+        .forEach(decorateSpinner);
     }
 
     var pending = false;
-    function schedule() {
+    function tick() {
       if (pending) return;
       pending = true;
-      requestAnimationFrame(function () { pending = false; decorate(); });
+      requestAnimationFrame(function () {
+        pending = false;
+        decorateButtons();
+        findSpinners();
+      });
     }
-    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
-    schedule();
 
-    /* hover sparkles */
-    var glyphs = ['❄', '✦', '✧'];
-    var last = 0;
-    document.addEventListener('mouseover', function (e) {
-      if (reduce) return;
-      var t = e.target.closest && e.target.closest('button, a, [role="button"]');
-      if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
-      var now = Date.now(); if (now - last < 120) return; last = now;
-      var r = t.getBoundingClientRect();
-      for (var i = 0; i < 5; i++) {
-        var s = document.createElement('span');
-        s.className = 'xmas-spark';
-        s.textContent = glyphs[i % glyphs.length];
-        s.style.left = (r.left + Math.random() * r.width) + 'px';
-        s.style.top = (r.top + Math.random() * r.height) + 'px';
-        s.style.fontSize = (9 + Math.random() * 7) + 'px';
-        s.style.setProperty('--dx', (Math.random() * 50 - 25) + 'px');
-        s.style.setProperty('--dy', (-10 - Math.random() * 40) + 'px');
-        document.body.appendChild(s);
-        setTimeout(function (el) { el.remove(); }, 850, s);
-      }
-    }, true);
+    new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
+    tick();
   })();
   </script>
 </body>
