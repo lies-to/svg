@@ -74,71 +74,37 @@
       display: block;
     }
 
-    /* Christmas lights — fixed at top of viewport */
-    .xmas-lights {
+    /* Light snowfall */
+    .xmas-snow {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 28px;
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-start;
-      padding: 0 8px;
+      inset: 0;
       pointer-events: none;
-      z-index: 99999;
+      z-index: 9998;
+      overflow: hidden;
     }
-    .xmas-lights::before {
-      content: "";
+    .xmas-flake {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(#2a2a2a, #161616);
-      border-radius: 0 0 3px 3px;
-      box-shadow: 0 1px 2px rgba(0,0,0,.5);
+      top: -10px;
+      color: #fff;
+      font-size: 12px;
+      opacity: 0.7;
+      text-shadow: 0 0 4px rgba(255,255,255,0.6);
+      animation: xmas-fall linear infinite;
+      will-change: transform;
     }
-    .xmas-bulb {
-      position: relative;
-      width: 11px;
-      height: 17px;
-      margin-top: 3px;
-      background: radial-gradient(circle at 50% 30%, #ffffff88, transparent 40%), var(--c);
-      border-radius: 50% 50% 45% 45% / 45% 45% 55% 55%;
-      box-shadow:
-        0 0 5px var(--c),
-        0 0 12px var(--c),
-        0 0 20px var(--c);
-      animation: xmas-twinkle 2.4s ease-in-out infinite;
-      animation-delay: var(--d, 0s);
-    }
-    .xmas-bulb::before {
-      content: "";
-      position: absolute;
-      top: -3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 5px;
-      height: 4px;
-      background: #444;
-      border-radius: 1px 1px 2px 2px;
-    }
-    @keyframes xmas-twinkle {
-      0%, 100% { filter: brightness(1.1); }
-      50% { filter: brightness(0.7); }
+    @keyframes xmas-fall {
+      0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+      100% { transform: translate3d(var(--drift, 20px), 110vh, 0) rotate(360deg); }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .xmas-candy::before,
-      .xmas-bulb { animation: none !important; }
+      .xmas-flake { animation: none !important; }
+      .xmas-snow { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- Christmas lights -->
-  <div class="xmas-lights" id="xmas-lights" aria-hidden="true"></div>
-
   <div id="root"></div>
 
   <script src="https://cdn.jsdelivr.net/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"></script>
@@ -193,7 +159,6 @@
       if (!el || el === document.body || el === document.documentElement) return;
       if (el.querySelector('img.xmas-santa-thinking')) return;
 
-      // hide whatever was inside (spinner icon / ring / text)
       Array.prototype.forEach.call(el.children, function (c) {
         c.style.display = 'none';
       });
@@ -224,19 +189,31 @@
       ].join(', ')).forEach(decorateSpinner);
     }
 
-    /* Build the string of Christmas lights */
-    (function makeLights() {
-      var host = document.getElementById('xmas-lights');
-      if (!host || host.dataset.built) return;
-      host.dataset.built = '1';
-      var colors = ['#ff4040', '#ffd24a', '#4dd964', '#4ab8ff', '#ff7be0'];
-      var count = Math.max(12, Math.floor(window.innerWidth / 60));
+    /* Light snowfall — a handful of slow flakes */
+    (function makeSnow() {
+      if (document.getElementById('xmas-snow-host')) return;
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var host = document.createElement('div');
+      host.id = 'xmas-snow-host';
+      host.className = 'xmas-snow';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+
+      var glyphs = ['❄', '❅', '❆', '·'];
+      var count = 18;
       for (var i = 0; i < count; i++) {
-        var b = document.createElement('span');
-        b.className = 'xmas-bulb';
-        b.style.setProperty('--c', colors[i % colors.length]);
-        b.style.setProperty('--d', (i * 0.12) + 's');
-        host.appendChild(b);
+        var f = document.createElement('span');
+        f.className = 'xmas-flake';
+        f.textContent = glyphs[i % glyphs.length];
+        f.style.left = (Math.random() * 100) + '%';
+        f.style.fontSize = (8 + Math.random() * 10) + 'px';
+        f.style.opacity = (0.35 + Math.random() * 0.45).toFixed(2);
+        var dur = 12 + Math.random() * 14;
+        f.style.animationDuration = dur.toFixed(1) + 's';
+        f.style.animationDelay = (-Math.random() * dur).toFixed(1) + 's';
+        f.style.setProperty('--drift', (Math.random() * 80 - 40).toFixed(0) + 'px');
+        host.appendChild(f);
       }
     })();
 
