@@ -19,6 +19,130 @@
   <link rel="stylesheet" crossorigin href="../assets/account-BstM5he2.css">
   <link rel="stylesheet" crossorigin href="../assets/page-enter-DdmT-DPn.css">
   <link rel="stylesheet" crossorigin href="../assets/settings-D1IbxjIP.css">
+
+  <!-- ===================== CHRISTMAS THEME (overlay only) ===================== -->
+  <style id="xmas-theme">
+    :root {
+      --xmas-red: #d42426;
+      --xmas-red-dark: #7d0b0e;
+      --xmas-green: #165b33;
+      --xmas-green-dark: #0b2e1c;
+      --xmas-gold: #ffd86b;
+      --xmas-snow: #fffaf0;
+    }
+
+    ::selection { background: var(--xmas-red); color: #fff; }
+
+    a:hover { text-shadow: 0 0 8px var(--xmas-gold), 0 0 16px rgba(255,216,107,.6); }
+
+    /* ---------- Candy cane buttons ---------- */
+    button:not(.xmas-skip),
+    [role="button"]:not(.xmas-skip),
+    input[type="submit"], input[type="button"], input[type="reset"],
+    a[class*="btn"], a[class*="button"] {
+      background-color: var(--xmas-red) !important;
+      background-image: linear-gradient(45deg,
+        var(--xmas-red) 25%, #fff 25%, #fff 50%,
+        var(--xmas-red) 50%, var(--xmas-red) 75%, #fff 75%, #fff) !important;
+      background-size: 28px 28px !important;
+      color: #fff !important;
+      font-weight: 600;
+      letter-spacing: .2px;
+      text-shadow:
+        0 0 4px var(--xmas-red-dark), 0 0 2px var(--xmas-red-dark),
+        1px 1px 0 var(--xmas-red-dark), -1px -1px 0 var(--xmas-red-dark),
+        1px -1px 0 var(--xmas-red-dark), -1px 1px 0 var(--xmas-red-dark);
+      border: 2px solid #fff !important;
+      border-radius: 14px;
+      box-shadow: 0 3px 0 var(--xmas-red-dark), 0 6px 14px rgba(0,0,0,.35);
+      cursor: pointer;
+      position: relative;
+      transition: transform .18s cubic-bezier(.3,1.6,.5,1), box-shadow .18s, filter .18s;
+    }
+    button:not(.xmas-skip):hover,
+    [role="button"]:not(.xmas-skip):hover,
+    input[type="submit"]:hover, input[type="button"]:hover, input[type="reset"]:hover,
+    a[class*="btn"]:hover, a[class*="button"]:hover {
+      animation: xmas-stripes .8s linear infinite, xmas-wiggle .5s ease-in-out;
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 5px 0 var(--xmas-red-dark), 0 0 18px rgba(255,216,107,.65), 0 8px 18px rgba(0,0,0,.4);
+      filter: brightness(1.08) saturate(1.1);
+    }
+    button:not(.xmas-skip):active,
+    [role="button"]:not(.xmas-skip):active,
+    input[type="submit"]:active, input[type="button"]:active {
+      transform: translateY(2px) scale(.98);
+      box-shadow: 0 1px 0 var(--xmas-red-dark), 0 2px 6px rgba(0,0,0,.35);
+    }
+    button:disabled { filter: grayscale(.5) brightness(.8); cursor: not-allowed; }
+
+    @keyframes xmas-stripes { to { background-position: 28px 0; } }
+    @keyframes xmas-wiggle {
+      0%,100% { rotate: 0deg; }
+      20% { rotate: -3deg; } 40% { rotate: 3deg; }
+      60% { rotate: -2deg; } 80% { rotate: 2deg; }
+    }
+
+    /* ---------- Inputs ---------- */
+    input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+    textarea, select {
+      border-color: rgba(255,250,240,.35) !important;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none !important;
+      border-color: var(--xmas-gold) !important;
+      box-shadow: 0 0 0 3px rgba(212,36,38,.45), 0 0 14px rgba(255,216,107,.5) !important;
+    }
+
+    /* ---------- Hover glow on cards / list rows ---------- */
+    [class*="card"], [class*="panel"], [class*="row"], [class*="item"], li {
+      transition: transform .2s, box-shadow .25s, border-color .25s;
+    }
+    [class*="card"]:hover, [class*="panel"]:hover {
+      border-color: rgba(255,216,107,.6) !important;
+      box-shadow: 0 0 0 1px rgba(255,216,107,.35), 0 10px 28px rgba(0,0,0,.35), 0 0 22px rgba(212,36,38,.25) !important;
+    }
+
+    /* ---------- String lights ---------- */
+    #xmas-lights {
+      position: fixed; top: 0; left: 0; right: 0; height: 34px;
+      display: flex; justify-content: space-around; align-items: flex-start;
+      pointer-events: none; z-index: 9990; overflow: hidden;
+    }
+    #xmas-lights::before {
+      content: ""; position: absolute; top: 5px; left: -2%; right: -2%; height: 12px;
+      border-bottom: 2px solid #1a1a1a; border-radius: 0 0 50% 50% / 0 0 100% 100%;
+      opacity: .75;
+    }
+    .xmas-bulb {
+      width: 11px; height: 17px; margin-top: 12px; border-radius: 50% 50% 55% 55%;
+      background: var(--c); box-shadow: 0 0 10px 3px var(--c);
+      animation: xmas-twinkle 1.8s ease-in-out infinite; animation-delay: var(--d);
+      position: relative;
+    }
+    .xmas-bulb::before {
+      content: ""; position: absolute; top: -4px; left: 2px; width: 7px; height: 5px;
+      background: #2b2b2b; border-radius: 2px 2px 0 0;
+    }
+    @keyframes xmas-twinkle { 0%,100% { opacity: 1; filter: brightness(1.2); } 50% { opacity: .35; filter: brightness(.7); } }
+
+    /* ---------- Hover sparkles ---------- */
+    .xmas-spark {
+      position: fixed; z-index: 9995; pointer-events: none; font-size: 14px; line-height: 1;
+      color: #fff; text-shadow: 0 0 6px var(--xmas-gold), 0 0 12px var(--xmas-gold);
+      animation: xmas-spark .85s ease-out forwards;
+    }
+    @keyframes xmas-spark {
+      0% { opacity: 1; transform: translate(0,0) scale(.4) rotate(0); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(180deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .xmas-bulb { animation: none; }
+      button:hover { animation: none !important; }
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
@@ -33,5 +157,53 @@
   <script>window.lucide||document.write('<script src="https://jsd.onmicrosoft.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://jsd.liiiu.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://cdn.statically.io/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
+
+  <!-- ===================== CHRISTMAS THEME SCRIPT ===================== -->
+  <script id="xmas-script">
+  (function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---- String lights ---- */
+    var lights = document.createElement('div');
+    lights.id = 'xmas-lights';
+    var colors = ['#ff3b3b', '#ffd86b', '#3bff7a', '#4db8ff', '#ff7bd5'];
+    var count = Math.max(10, Math.floor(window.innerWidth / 48));
+    for (var i = 0; i < count; i++) {
+      var b = document.createElement('i');
+      b.className = 'xmas-bulb';
+      b.style.setProperty('--c', colors[i % colors.length]);
+      b.style.setProperty('--d', (i * 0.27 % 1.8).toFixed(2) + 's');
+      lights.appendChild(b);
+    }
+    document.body.appendChild(lights);
+
+    /* ---- Hover sparkles on buttons / links ---- */
+    var glyphs = ['\u2744', '\u2726', '\u2727', '\u2745'];
+    var lastSpark = 0;
+    document.addEventListener('mouseover', function (e) {
+      if (reduce) return;
+      var t = e.target.closest && e.target.closest('button, a, [role="button"], input[type="submit"], input[type="button"]');
+      if (!t) return;
+      if (e.relatedTarget && t.contains(e.relatedTarget)) return;
+      var now = Date.now();
+      if (now - lastSpark < 90) return;
+      lastSpark = now;
+      var r = t.getBoundingClientRect();
+      for (var i = 0; i < 7; i++) {
+        var s = document.createElement('span');
+        s.className = 'xmas-spark';
+        s.textContent = glyphs[i % glyphs.length];
+        s.style.left = (r.left + Math.random() * r.width) + 'px';
+        s.style.top = (r.top + Math.random() * r.height) + 'px';
+        s.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px');
+        s.style.setProperty('--dy', (Math.random() * -50 - 10) + 'px');
+        s.style.fontSize = (10 + Math.random() * 10) + 'px';
+        document.body.appendChild(s);
+        setTimeout((function (el) { return function () { el.remove(); }; })(s), 900);
+      }
+    }, true);
+
+  })();
+  </script>
 </body>
 </html>
