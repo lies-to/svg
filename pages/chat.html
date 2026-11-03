@@ -24,6 +24,103 @@
   <link rel="stylesheet" crossorigin href="../assets/chat-DhX8qBPT.css">
   <link rel="stylesheet" crossorigin href="../assets/page-enter-DdmT-DPn.css">
   <link rel="stylesheet" crossorigin href="../assets/mobile-hxndgT7C.css">
+
+  <!-- ===================== small xmas add-on ===================== -->
+  <style id="xmas-theme">
+    /* ---------- Candy-cane fill on the send button (JS moves the pattern) ---------- */
+    [data-xmas-candy] {
+      background-color: #d42426 !important;
+      background-image: linear-gradient(45deg,
+        #d42426 25%, #ffffff 25%, #ffffff 50%,
+        #d42426 50%, #d42426 75%, #ffffff 75%) !important;
+      background-size: 28px 28px !important;
+      background-repeat: repeat !important;
+      background-position: 0 0;
+      color: #fff !important;
+      text-shadow:
+        1px 1px 0 #7d0b0e,
+        -1px -1px 0 #7d0b0e,
+        1px -1px 0 #7d0b0e,
+        -1px 1px 0 #7d0b0e,
+        0 2px 4px rgba(0,0,0,0.35);
+      /* Let JS own background-position — exclude it from the transition. */
+      transition:
+        color 0.2s,
+        background-color 0.2s,
+        border-color 0.2s,
+        box-shadow 0.2s,
+        opacity 0.2s,
+        transform 0.2s !important;
+    }
+    [data-xmas-candy]:hover,
+    [data-xmas-candy]:focus,
+    [data-xmas-candy]:focus-visible,
+    [data-xmas-candy]:active {
+      background-color: #d42426 !important;
+      background-image: linear-gradient(45deg,
+        #d42426 25%, #ffffff 25%, #ffffff 50%,
+        #d42426 50%, #d42426 75%, #ffffff 75%) !important;
+      background-size: 28px 28px !important;
+      background-repeat: repeat !important;
+      color: #fff !important;
+    }
+    [data-xmas-candy] svg { color: #fff !important; }
+
+    /* ---------- Candy cane badge next to every name ---------- */
+    [data-xmas-name-badge] {
+      position: relative;
+    }
+    [data-xmas-name-badge]::after {
+      content: "";
+      display: inline-block;
+      width: 0.75em;
+      height: 0.92em;
+      margin-left: 0.22em;
+      vertical-align: -0.14em;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M6 22 V10 A4 4 0 0 1 14 10 V12' fill='none' stroke='%23d42426' stroke-width='3.2' stroke-linecap='round'/%3E%3Cpath d='M6 22 V10 A4 4 0 0 1 14 10 V12' fill='none' stroke='%23ffffff' stroke-width='3.2' stroke-dasharray='1.5 2.5'/%3E%3C/svg%3E") center/contain no-repeat;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 0.5px rgba(0,0,0,0.35));
+    }
+
+    /* ---------- Santa GIF in the AI "thinking" slot ---------- */
+    .xmas-santa-thinking {
+      width: 1.2em;
+      height: 1.2em;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* ---------- Light snowfall — identical to the AI page ---------- */
+    .xmas-snow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      overflow: hidden;
+    }
+    .xmas-flake {
+      position: absolute;
+      top: -10px;
+      color: #fff;
+      font-size: 12px;
+      opacity: 0.7;
+      text-shadow: 0 0 4px rgba(255,255,255,0.6);
+      animation: xmas-fall linear infinite;
+      will-change: transform;
+    }
+    @keyframes xmas-fall {
+      0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+      100% { transform: translate3d(var(--drift, 20px), 110vh, 0) rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .xmas-flake { animation: none !important; }
+      .xmas-snow { display: none; }
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
@@ -38,5 +135,221 @@
   <script>window.lucide||document.write('<script src="https://jsd.onmicrosoft.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://jsd.liiiu.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://cdn.statically.io/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
+
+  <!-- ===================== small xmas add-on script ===================== -->
+  <script id="xmas-script">
+  (function () {
+    var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ================================================================
+     * 1. SEND BUTTON — candy-cane fill with JS-driven smooth velocity
+     * ================================================================ */
+    var SEND_LABEL = /send|submit|arrow-?up|paper-?plane/i;
+    var MAX_SPEED = 0.7;
+    var SMOOTHING = 0.08;
+    var PERIOD = 28;
+
+    var btnStates = new Map();
+    var btnRunning = false;
+
+    function labelOf(el) {
+      return [
+        el.getAttribute('aria-label') || '',
+        el.title || '',
+        el.id || '',
+        typeof el.className === 'string' ? el.className : '',
+        el.getAttribute('data-testid') || '',
+        el.value || '',
+        (el.textContent || '').trim()
+      ].join(' ');
+    }
+
+    function isSendButton(b) {
+      if (b.type === 'submit') return true;
+      if (SEND_LABEL.test(labelOf(b))) return true;
+      var svg = b.querySelector('svg');
+      return !!(svg && SEND_LABEL.test((svg.getAttribute('class') || '') + ' ' +
+                                       (svg.getAttribute('data-lucide') || '')));
+    }
+
+    function ensureBtnState(el) {
+      var s = btnStates.get(el);
+      if (s) return s;
+      s = { x: 0, vel: 0, hover: false };
+      btnStates.set(el, s);
+      el.addEventListener('mouseenter', function () { s.hover = true;  ensureBtnLoop(); });
+      el.addEventListener('mouseleave', function () { s.hover = false; ensureBtnLoop(); });
+      el.addEventListener('focus',      function () { s.hover = true;  ensureBtnLoop(); });
+      el.addEventListener('blur',       function () { s.hover = false; ensureBtnLoop(); });
+      return s;
+    }
+
+    function btnFrame(now) {
+      var dt = Math.min(50, now - (btnFrame._last || now)) / 16.67;
+      btnFrame._last = now;
+      var anyActive = false;
+
+      btnStates.forEach(function (s, el) {
+        if (!el.isConnected) { btnStates.delete(el); return; }
+        var target = s.hover ? MAX_SPEED : 0;
+        var k = 1 - Math.pow(1 - SMOOTHING, dt);
+        s.vel += (target - s.vel) * k;
+        if (Math.abs(s.vel) < 0.01 && !s.hover) s.vel = 0;
+        else anyActive = true;
+        s.x += s.vel * dt;
+        if (s.x >= PERIOD) s.x -= PERIOD;
+        el.style.backgroundPosition = s.x.toFixed(2) + 'px 0';
+      });
+
+      if (anyActive) requestAnimationFrame(btnFrame);
+      else { btnRunning = false; btnFrame._last = 0; }
+    }
+
+    function ensureBtnLoop() {
+      if (btnRunning) return;
+      btnRunning = true;
+      btnFrame._last = performance.now();
+      requestAnimationFrame(btnFrame);
+    }
+
+    function decorateButtons() {
+      document.querySelectorAll('button, [role="button"], input[type="submit"]').forEach(function (b) {
+        if (b.hasAttribute('data-xmas-candy')) return;
+        if (!isSendButton(b)) return;
+        b.setAttribute('data-xmas-candy', '1');
+        ensureBtnState(b);
+      });
+    }
+
+    /* ================================================================
+     * 2. THINKING SPINNER — replace with santa.gif
+     * ================================================================ */
+    function decorateSpinner(el) {
+      if (!el) return;
+      if (el.tagName === 'svg') el = el.parentElement;
+      if (!el || el === document.body || el === document.documentElement) return;
+      if (el.querySelector('img.xmas-santa-thinking')) return;
+
+      Array.prototype.forEach.call(el.children, function (c) { c.style.display = 'none'; });
+
+      var img = document.createElement('img');
+      img.src = '/pages/assets/santa.gif';
+      img.alt = 'Thinking';
+      img.className = 'xmas-santa-thinking';
+      img.setAttribute('aria-hidden', 'true');
+      el.appendChild(img);
+
+      el.style.animation = 'none';
+      el.style.display = 'inline-flex';
+      el.style.alignItems = 'center';
+      el.style.justifyContent = 'center';
+    }
+
+    function findSpinners() {
+      document.querySelectorAll([
+        '.animate-spin',
+        '[role="status"]',
+        '[aria-label*="loading" i]',
+        '[aria-label*="thinking" i]',
+        '[data-testid*="loading" i]',
+        '[data-testid*="spinner" i]',
+        '[data-testid*="thinking" i]',
+        '[data-testid*="typing" i]'
+      ].join(', ')).forEach(decorateSpinner);
+    }
+
+    /* ================================================================
+     * 3. NAME BADGE — candy cane next to every rendered name
+     * ================================================================ */
+    var NAME_SELECTOR = [
+      '[data-xmas-name]',
+      '[data-name-style]',
+      '[class*="name-style" i]',
+      '[class*="nameStyle" i]',
+      '[data-testid*="author" i]',
+      '[data-testid*="username" i]',
+      '[data-testid*="displayname" i]',
+      '[data-testid*="display-name" i]',
+      '[class*="author-name" i]',
+      '[class*="authorName" i]',
+      '[class*="message-author" i]',
+      '[class*="messageAuthor" i]',
+      '[class*="display-name" i]:not([class*="avatar" i])',
+      '[class*="displayName" i]:not([class*="avatar" i])',
+      '[class*="username" i]:not([class*="input" i]):not([class*="field" i]):not([class*="form" i]):not([class*="label" i]):not([class*="avatar" i]):not([class*="button" i]):not([class*="btn" i])'
+    ].join(', ');
+
+    function looksLikeName(el) {
+      var tag = el.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON') return false;
+      if (el.querySelector('input, textarea, select, button, form')) return false;
+      if (el.closest('form')) return false;
+      var text = (el.textContent || '').trim();
+      if (!text) return false;
+      if (text.length > 64) return false;
+      if (/^(https?:|mailto:)/i.test(text)) return false;
+      return true;
+    }
+
+    function decorateNames() {
+      var all = document.querySelectorAll(NAME_SELECTOR);
+      all.forEach(function (el) {
+        if (el.hasAttribute('data-xmas-name-badge')) return;
+        /* If it contains another matching name element, let the inner one win. */
+        if (el.querySelector(NAME_SELECTOR)) return;
+        if (!looksLikeName(el)) return;
+        el.setAttribute('data-xmas-name-badge', '1');
+      });
+    }
+
+    /* ================================================================
+     * 4. SNOW — identical to the AI page
+     * ================================================================ */
+    (function makeSnow() {
+      if (reduced) return;
+      if (document.getElementById('xmas-snow-host')) return;
+
+      var host = document.createElement('div');
+      host.id = 'xmas-snow-host';
+      host.className = 'xmas-snow';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+
+      var glyphs = ['\u2744', '\u2745', '\u2746', '\u00b7'];
+      var count = 18;
+      for (var i = 0; i < count; i++) {
+        var f = document.createElement('span');
+        f.className = 'xmas-flake';
+        f.textContent = glyphs[i % glyphs.length];
+        f.style.left = (Math.random() * 100) + '%';
+        f.style.fontSize = (8 + Math.random() * 10) + 'px';
+        f.style.opacity = (0.35 + Math.random() * 0.45).toFixed(2);
+        var dur = 12 + Math.random() * 14;
+        f.style.animationDuration = dur.toFixed(1) + 's';
+        f.style.animationDelay = (-Math.random() * dur).toFixed(1) + 's';
+        f.style.setProperty('--drift', (Math.random() * 80 - 40).toFixed(0) + 'px');
+        host.appendChild(f);
+      }
+    })();
+
+    /* ================================================================
+     * 5. Batch everything on the next rAF
+     * ================================================================ */
+    var pending = false;
+    function tick() {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () {
+        pending = false;
+        decorateButtons();
+        findSpinners();
+        decorateNames();
+      });
+    }
+
+    new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
+    tick();
+  })();
+  </script>
 </body>
 </html>
