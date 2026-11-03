@@ -14,6 +14,156 @@
   <link rel="stylesheet" crossorigin href="../assets/games-t4r6VEwK.css">
   <link rel="stylesheet" crossorigin href="../assets/page-enter-DdmT-DPn.css">
   <link rel="stylesheet" crossorigin href="../assets/mobile-hxndgT7C.css">
+
+  <!-- ===================== small xmas add-on ===================== -->
+  <style id="xmas-theme">
+    /* ---------- Snow (same settings as AI page) ---------- */
+    .xmas-snow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      overflow: hidden;
+    }
+    .xmas-flake {
+      position: absolute;
+      top: -10px;
+      color: #fff;
+      font-size: 12px;
+      opacity: 0.7;
+      text-shadow: 0 0 4px rgba(255,255,255,0.6);
+      animation: xmas-fall linear infinite;
+      will-change: transform;
+    }
+    @keyframes xmas-fall {
+      0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+      100% { transform: translate3d(var(--drift, 20px), 110vh, 0) rotate(360deg); }
+    }
+
+    /* ---------- Card flip (front rotates away) ---------- */
+    .xmas-card-flipped {
+      transform: perspective(900px) rotateY(85deg) scale(0.96) !important;
+      transition: transform .45s cubic-bezier(.5,.05,.2,1) !important;
+      pointer-events: none !important;
+      opacity: 0.55 !important;
+    }
+
+    /* ---------- The "back" menu ---------- */
+    .xmas-game-menu {
+      position: fixed;
+      z-index: 9995;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #141414;
+      display: flex;
+      flex-direction: column;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.7),
+        0 0 0 2px rgba(212,36,38,0.55),
+        0 0 24px rgba(212,36,38,0.2);
+      transform-style: preserve-3d;
+      animation: xmas-menu-in .5s cubic-bezier(.5,.05,.2,1.15) both;
+      font-family: Inter, Roboto, system-ui, sans-serif;
+    }
+    .xmas-game-menu.closing {
+      animation: xmas-menu-out .35s cubic-bezier(.6,0,.7,0) both;
+    }
+    @keyframes xmas-menu-in {
+      from { opacity: 0; transform: perspective(900px) rotateY(-90deg) scale(.85); }
+      to   { opacity: 1; transform: perspective(900px) rotateY(0) scale(1); }
+    }
+    @keyframes xmas-menu-out {
+      from { opacity: 1; transform: perspective(900px) rotateY(0) scale(1); }
+      to   { opacity: 0; transform: perspective(900px) rotateY(-90deg) scale(.85); }
+    }
+
+    .xmas-menu-cover {
+      flex: 1 1 auto;
+      min-height: 0;
+      background-size: cover;
+      background-position: center;
+      background-color: #0c0c0c;
+      position: relative;
+    }
+    .xmas-menu-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(20,20,20,0.92), #141414);
+    }
+    .xmas-menu-desc {
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #cfcfcf;
+    }
+    .xmas-menu-play {
+      appearance: none;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 13.5px;
+      letter-spacing: .3px;
+      cursor: pointer;
+      color: #fff;
+      background-color: #d42426;
+      background-image: linear-gradient(45deg,
+        #d42426 25%, #ffffff 25%, #ffffff 50%,
+        #d42426 50%, #d42426 75%, #ffffff 75%);
+      background-size: 22px 22px;
+      text-shadow:
+        1px 1px 0 #7d0b0e, -1px -1px 0 #7d0b0e,
+        1px -1px 0 #7d0b0e, -1px 1px 0 #7d0b0e,
+        0 2px 4px rgba(0,0,0,0.4);
+      box-shadow: 0 3px 0 #7d0b0e, 0 6px 14px rgba(0,0,0,0.4);
+      transition: transform .15s, filter .15s;
+    }
+    .xmas-menu-play:hover { transform: translateY(-1px) scale(1.03); filter: brightness(1.08); }
+    .xmas-menu-play:active { transform: translateY(1px) scale(.98); box-shadow: 0 1px 0 #7d0b0e; }
+
+    .xmas-menu-close {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      font-size: 15px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .xmas-menu-close:hover { background: rgba(0,0,0,0.85); }
+
+    /* ---------- Candy cane confetti ---------- */
+    .xmas-confetti {
+      position: fixed;
+      width: 8px;
+      height: 5px;
+      border-radius: 1px;
+      pointer-events: none;
+      z-index: 9997;
+      will-change: transform;
+      animation: xmas-confetti-fly 1.3s cubic-bezier(.2,.7,.3,1) forwards;
+    }
+    .xmas-confetti.cane {
+      background: repeating-linear-gradient(45deg, #d42426 0 3px, #ffffff 3px 6px);
+    }
+    @keyframes xmas-confetti-fly {
+      0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .xmas-flake { animation: none !important; }
+      .xmas-snow { display: none; }
+      .xmas-game-menu { animation: none !important; }
+      .xmas-confetti { display: none; }
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
@@ -29,5 +179,323 @@
   <script>window.lucide||document.write('<script src="https://jsd.liiiu.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://cdn.statically.io/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script src="https://cdn.jsdelivr.net/gh/achroma-ubg/script@latest/fonts.min.js"></script>
+
+  <!-- ===================== small xmas add-on script ===================== -->
+  <script id="xmas-script">
+  (function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- Snow (identical to AI page) ---------- */
+    (function makeSnow() {
+      if (document.getElementById('xmas-snow-host')) return;
+      if (reduce) return;
+
+      var host = document.createElement('div');
+      host.id = 'xmas-snow-host';
+      host.className = 'xmas-snow';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+
+      var glyphs = ['\u2744', '\u2745', '\u2746', '\u00b7'];
+      var count = 18;
+      for (var i = 0; i < count; i++) {
+        var f = document.createElement('span');
+        f.className = 'xmas-flake';
+        f.textContent = glyphs[i % glyphs.length];
+        f.style.left = (Math.random() * 100) + '%';
+        f.style.fontSize = (8 + Math.random() * 10) + 'px';
+        f.style.opacity = (0.35 + Math.random() * 0.45).toFixed(2);
+        var dur = 12 + Math.random() * 14;
+        f.style.animationDuration = dur.toFixed(1) + 's';
+        f.style.animationDelay = (-Math.random() * dur).toFixed(1) + 's';
+        f.style.setProperty('--drift', (Math.random() * 80 - 40).toFixed(0) + 'px');
+        host.appendChild(f);
+      }
+    })();
+
+    /* ---------- Find game cards ---------- */
+    var cards = [];
+
+    function looksLikeCard(el) {
+      if (el.closest('nav, header, footer')) return false;
+      var r = el.getBoundingClientRect();
+      if (r.width < 120 || r.height < 120) return false;
+      if (el.querySelector('img')) return true;
+      if (/url\(/.test(getComputedStyle(el).backgroundImage)) return true;
+      // any child with a background image
+      var kids = el.children;
+      for (var i = 0; i < kids.length; i++) {
+        if (/url\(/.test(getComputedStyle(kids[i]).backgroundImage)) return true;
+      }
+      return false;
+    }
+
+    function findCards() {
+      // Prefer explicit game card classes
+      var explicit = document.querySelectorAll(
+        '[class*="game-card" i], [class*="gameCard" i], [class*="game-tile" i], [data-game-card], [data-game]'
+      );
+      var list = Array.prototype.slice.call(explicit).filter(looksLikeCard);
+
+      if (list.length === 0) {
+        // Fall back to anchors pointing at game routes
+        var anchors = document.querySelectorAll('a[href*="/game"], a[href*="/play"]');
+        list = Array.prototype.slice.call(anchors).filter(looksLikeCard);
+      }
+
+      if (list.length === 0) {
+        // Fall back to grid/list children with images
+        var grids = document.querySelectorAll('[class*="grid" i], [class*="list" i]');
+        grids.forEach(function (grid) {
+          Array.prototype.forEach.call(grid.children, function (kid) {
+            if (looksLikeCard(kid)) list.push(kid);
+          });
+        });
+      }
+
+      // Dedupe nested
+      return list.filter(function (el) {
+        return !list.some(function (other) {
+          return other !== el && el.contains(other);
+        });
+      });
+    }
+
+    function refreshCards() { cards = findCards(); }
+
+    /* ---------- Helpers ---------- */
+    function getCover(card) {
+      var img = card.querySelector('img');
+      if (img && img.src) return img.src;
+      var bg = getComputedStyle(card).backgroundImage;
+      var m = bg && bg.match(/url\(["']?([^"')]+)["']?\)/);
+      if (m) return m[1];
+      var kids = card.querySelectorAll('*');
+      for (var i = 0; i < kids.length; i++) {
+        var k = kids[i];
+        if (k.tagName === 'IMG' && k.src) return k.src;
+        var b = getComputedStyle(k).backgroundImage;
+        var mm = b && b.match(/url\(["']?([^"')]+)["']?\)/);
+        if (mm) return mm[1];
+      }
+      return null;
+    }
+
+    var DESCS = [
+      'A little mystery. A lot of fun. Click Play to discover it.',
+      'Quick to learn, hard to stop. Give it a try.',
+      'No spoilers here \u2014 you\u2019ll have to play to find out.',
+      'The only way to know is to hit Play.',
+      'A fan favorite for a reason. See for yourself.',
+      'Simple rules, endless surprises. Ready?',
+      'You\u2019ll get it once you try it. Start playing.',
+      'One click and you\u2019re in. Click Play to begin.'
+    ];
+
+    function clickTargetOf(card) {
+      if (card.tagName === 'A' || card.tagName === 'BUTTON') return card;
+      var inner = card.querySelector('a, button, [role="button"]');
+      return inner || card;
+    }
+
+    /* ---------- Confetti ---------- */
+    function burstConfetti(rect) {
+      if (reduce) return;
+      var solids = ['#d42426', '#ffffff', '#165b33', '#ffd86b'];
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      for (var i = 0; i < 34; i++) {
+        var p = document.createElement('div');
+        p.className = 'xmas-confetti';
+        if (i % 3 === 0) {
+          p.classList.add('cane');
+        } else {
+          p.style.background = solids[i % solids.length];
+        }
+        var angle = Math.random() * Math.PI * 2;
+        var dist = 110 + Math.random() * 220;
+        var dx = Math.cos(angle) * dist;
+        var dyUp = -50 - Math.random() * 120;
+        var dyDown = dist * 0.4 + 180;
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        p.style.setProperty('--dx', dx.toFixed(0) + 'px');
+        p.style.setProperty('--dy', (dyUp + dyDown).toFixed(0) + 'px');
+        p.style.setProperty('--r', (Math.random() * 720 - 360).toFixed(0) + 'deg');
+        p.style.animationDelay = (Math.random() * 0.08) + 's';
+        document.body.appendChild(p);
+        (function (el) {
+          setTimeout(function () { el.remove(); }, 1500);
+        })(p);
+      }
+    }
+
+    /* ---------- Open / close the flip menu ---------- */
+    var activeMenu = null;
+    var activeCard = null;
+    var bypassNext = false;
+
+    function closeMenu() {
+      if (!activeMenu) return;
+      var menu = activeMenu;
+      var card = activeCard;
+      activeMenu = null;
+      activeCard = null;
+      menu.classList.add('closing');
+      if (card) {
+        card.classList.remove('xmas-card-flipped');
+        card.style.removeProperty('transform');
+        card.style.removeProperty('opacity');
+      }
+      setTimeout(function () { menu.remove(); }, 380);
+    }
+
+    function openMenu(card) {
+      closeMenu();
+
+      var rect = card.getBoundingClientRect();
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var w = Math.min(Math.max(rect.width, 240), vw - 24);
+      var h = Math.min(Math.max(rect.height, 300), vh - 24);
+      var left = Math.max(12, Math.min(rect.left, vw - w - 12));
+      var top = Math.max(12, Math.min(rect.top, vh - h - 12));
+
+      var menu = document.createElement('div');
+      menu.className = 'xmas-game-menu';
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+      menu.style.width = w + 'px';
+      menu.style.height = h + 'px';
+
+      var cover = document.createElement('div');
+      cover.className = 'xmas-menu-cover';
+      var coverUrl = getCover(card);
+      if (coverUrl) cover.style.backgroundImage = 'url("' + coverUrl + '")';
+
+      var closeBtn = document.createElement('button');
+      closeBtn.className = 'xmas-menu-close';
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.textContent = '\u2715';
+      closeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeMenu();
+      });
+      cover.appendChild(closeBtn);
+
+      var body = document.createElement('div');
+      body.className = 'xmas-menu-body';
+
+      var desc = document.createElement('p');
+      desc.className = 'xmas-menu-desc';
+      desc.textContent = DESCS[Math.floor(Math.random() * DESCS.length)];
+
+      var play = document.createElement('button');
+      play.className = 'xmas-menu-play';
+      play.textContent = 'Play';
+      play.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var target = clickTargetOf(card);
+        closeMenu();
+        bypassNext = true;
+        // Give React a tick so the card un-flips first
+        setTimeout(function () {
+          try { target.click(); } catch (err) {}
+        }, 30);
+      });
+
+      body.appendChild(desc);
+      body.appendChild(play);
+      menu.appendChild(cover);
+      menu.appendChild(body);
+      document.body.appendChild(menu);
+
+      activeMenu = menu;
+      activeCard = card;
+      card.classList.add('xmas-card-flipped');
+      burstConfetti(menu.getBoundingClientRect());
+    }
+
+    /* ---------- Intercept clicks on game cards ---------- */
+    function findCardFromTarget(target) {
+      var el = target;
+      while (el && el !== document.body) {
+        if (cards.indexOf(el) !== -1) return el;
+        el = el.parentElement;
+      }
+      return null;
+    }
+
+    /* Walk up; if there's a real interactive element between target and card, skip */
+    function innerInteractive(target, card) {
+      var el = target;
+      while (el && el !== card && el !== document.body) {
+        if (el !== card) {
+          var tag = el.tagName;
+          if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+            return el;
+          }
+        }
+        el = el.parentElement;
+      }
+      return null;
+    }
+
+    document.addEventListener('click', function (e) {
+      if (bypassNext) { bypassNext = false; return; }
+      if (e.target.closest && e.target.closest('.xmas-game-menu')) return;
+
+      var card = findCardFromTarget(e.target);
+      if (!card) {
+        if (activeMenu) closeMenu();
+        return;
+      }
+
+      // Let inner buttons / links (favorite, menu, etc.) do their thing
+      var inner = innerInteractive(e.target, card);
+      if (inner) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      openMenu(card);
+    }, true);
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && activeMenu) closeMenu();
+    });
+
+    /* ---------- Watch for cards appearing / changing ---------- */
+    var refreshTimer = null;
+    function scheduleRefresh() {
+      if (refreshTimer) return;
+      refreshTimer = setTimeout(function () {
+        refreshTimer = null;
+        refreshCards();
+      }, 250);
+    }
+
+    var pending = false;
+    function tick() {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () {
+        pending = false;
+        refreshCards();
+      });
+    }
+
+    new MutationObserver(function () {
+      scheduleRefresh();
+      // If the active card was removed (route change), clear the menu
+      if (activeCard && !document.contains(activeCard)) closeMenu();
+    }).observe(document.body, { childList: true, subtree: true });
+
+    // Try immediately, then once more after load in case React renders late
+    tick();
+    window.addEventListener('load', function () { setTimeout(tick, 400); });
+    setTimeout(tick, 1200);
+  })();
+  </script>
 </body>
 </html>
