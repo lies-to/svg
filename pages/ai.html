@@ -16,6 +16,65 @@
   <link rel="stylesheet" crossorigin href="../assets/ai-ZQSPORdp.css">
   <link rel="stylesheet" crossorigin href="../assets/page-enter-DdmT-DPn.css">
   <link rel="stylesheet" crossorigin href="../assets/mobile-hxndgT7C.css">
+  <!-- ===================== CHRISTMAS TOUCHES (overlay only) ===================== -->
+  <style id="xmas-theme">
+    :root { --xmas-red:#d42426; --xmas-red-dark:#7d0b0e; --xmas-gold:#ffd86b; }
+    ::selection { background: var(--xmas-red); color: #fff; }
+
+    /* Candy cane: text buttons + send button (JS adds .xmas-candy) */
+    .xmas-candy {
+      background-color: var(--xmas-red) !important;
+      background-image: linear-gradient(45deg,
+        var(--xmas-red) 25%, #fff 25%, #fff 50%,
+        var(--xmas-red) 50%, var(--xmas-red) 75%, #fff 75%, #fff) !important;
+      background-size: 28px 28px !important;
+      color: #fff !important;
+      border: 2px solid #fff !important;
+      text-shadow: 0 0 3px var(--xmas-red-dark), 1px 1px 0 var(--xmas-red-dark), -1px -1px 0 var(--xmas-red-dark),
+                   1px -1px 0 var(--xmas-red-dark), -1px 1px 0 var(--xmas-red-dark);
+      box-shadow: 0 2px 0 var(--xmas-red-dark), 0 4px 10px rgba(0,0,0,.3);
+    }
+    .xmas-candy svg { filter: drop-shadow(0 0 2px var(--xmas-red-dark)); }
+
+    /* Hover effects on all buttons */
+    button { transition: transform .18s cubic-bezier(.3,1.6,.5,1), box-shadow .2s, filter .2s; }
+    button:not(:disabled):hover { transform: translateY(-1px) scale(1.05); filter: brightness(1.08); }
+    button:not(:disabled):active { transform: scale(.96); }
+    .xmas-candy:not(:disabled):hover {
+      animation: xmas-stripes .8s linear infinite, xmas-wiggle .45s ease-in-out;
+      box-shadow: 0 3px 0 var(--xmas-red-dark), 0 0 16px rgba(255,216,107,.65), 0 6px 14px rgba(0,0,0,.35);
+    }
+    @keyframes xmas-stripes { to { background-position: 28px 0; } }
+    @keyframes xmas-wiggle { 0%,100%{rotate:0deg} 25%{rotate:-4deg} 50%{rotate:4deg} 75%{rotate:-2deg} }
+
+    a:hover { text-shadow: 0 0 8px rgba(255,216,107,.7); }
+    input:focus, textarea:focus {
+      box-shadow: 0 0 0 2px rgba(212,36,38,.55), 0 0 12px rgba(255,216,107,.45) !important;
+    }
+
+    /* Santa hat on the send button */
+    .xmas-hat { position: relative; overflow: visible !important; }
+    .xmas-hat::before {
+      content: ""; position: absolute; top: -15px; left: -8px; width: 30px; height: 27px; z-index: 3;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M6 27 Q10 6 28 5 Q27 18 36 27Z' fill='%23d42426'/%3E%3Crect x='3' y='24' width='35' height='9' rx='4.5' fill='%23fff'/%3E%3Ccircle cx='29' cy='6' r='5' fill='%23fff'/%3E%3C/svg%3E") center / contain no-repeat;
+      transform: rotate(-18deg); transform-origin: 70% 90%; pointer-events: none;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.35));
+      transition: transform .25s cubic-bezier(.3,1.6,.5,1);
+    }
+    .xmas-hat:hover::before { transform: rotate(-6deg) translateY(-3px) scale(1.12); }
+
+    /* Hover sparkles */
+    .xmas-spark {
+      position: fixed; z-index: 9995; pointer-events: none; line-height: 1; color: #fff;
+      text-shadow: 0 0 6px var(--xmas-gold), 0 0 12px var(--xmas-gold);
+      animation: xmas-spark .8s ease-out forwards;
+    }
+    @keyframes xmas-spark {
+      0% { opacity: 1; transform: translate(0,0) scale(.4) rotate(0); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(180deg); }
+    }
+    @media (prefers-reduced-motion: reduce) { .xmas-candy:hover { animation: none !important; } }
+  </style>
 </head>
 <body>
   <div id="root"></div>
@@ -30,5 +89,66 @@
   <script>window.lucide||document.write('<script src="https://jsd.onmicrosoft.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://jsd.liiiu.cn/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
   <script>window.lucide||document.write('<script src="https://cdn.statically.io/gh/achroma-ubg/engine@253c89a66af72f8498a6b21105ee0fb3d88a4156/icons/icons.min.js"><\/script>')</script>
+  <!-- ===================== CHRISTMAS TOUCHES SCRIPT ===================== -->
+  <script id="xmas-script">
+  (function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var SEND = /send|submit|arrow-up|paper-?plane/i;
+
+    function isSend(b) {
+      if (b.type === 'submit') return true;
+      var attrs = [b.getAttribute('aria-label'), b.title, b.id, b.className && b.className.baseVal === undefined ? b.className : '',
+                   b.getAttribute('data-testid'), b.getAttribute('data-icon')].join(' ');
+      if (SEND.test(attrs)) return true;
+      var svg = b.querySelector('svg');
+      return !!(svg && SEND.test((svg.getAttribute('class') || '') + ' ' + (svg.getAttribute('data-lucide') || '')));
+    }
+
+    function decorate() {
+      var btns = document.querySelectorAll('button');
+      for (var i = 0; i < btns.length; i++) {
+        var b = btns[i];
+        if (b.classList.contains('xmas-skip')) continue;
+        var send = isSend(b);
+        var hasText = b.textContent.trim().length > 0;
+        // only one hat: the send button closest to a text box
+        if (send) b.classList.add('xmas-hat');
+        if (send || hasText) b.classList.add('xmas-candy');
+      }
+    }
+
+    var pending = false;
+    function schedule() {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () { pending = false; decorate(); });
+    }
+    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    schedule();
+
+    /* hover sparkles */
+    var glyphs = ['❄', '✦', '✧'];
+    var last = 0;
+    document.addEventListener('mouseover', function (e) {
+      if (reduce) return;
+      var t = e.target.closest && e.target.closest('button, a, [role="button"]');
+      if (!t || (e.relatedTarget && t.contains(e.relatedTarget))) return;
+      var now = Date.now(); if (now - last < 120) return; last = now;
+      var r = t.getBoundingClientRect();
+      for (var i = 0; i < 5; i++) {
+        var s = document.createElement('span');
+        s.className = 'xmas-spark';
+        s.textContent = glyphs[i % glyphs.length];
+        s.style.left = (r.left + Math.random() * r.width) + 'px';
+        s.style.top = (r.top + Math.random() * r.height) + 'px';
+        s.style.fontSize = (9 + Math.random() * 7) + 'px';
+        s.style.setProperty('--dx', (Math.random() * 50 - 25) + 'px');
+        s.style.setProperty('--dy', (-10 - Math.random() * 40) + 'px');
+        document.body.appendChild(s);
+        setTimeout(function (el) { el.remove(); }, 850, s);
+      }
+    }, true);
+  })();
+  </script>
 </body>
 </html>
