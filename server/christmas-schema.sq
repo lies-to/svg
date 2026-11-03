@@ -1,0 +1,24 @@
+-- Run once against the site's PostgreSQL database.
+CREATE TABLE IF NOT EXISTS christmas_calendar_claims (
+  user_id TEXT NOT NULL,
+  season_year INTEGER NOT NULL,
+  day INTEGER NOT NULL CHECK (day BETWEEN 1 AND 25),
+  coins INTEGER NOT NULL CHECK (coins BETWEEN 1 AND 5),
+  claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, season_year, day)
+);
+CREATE TABLE IF NOT EXISTS christmas_cane_claims (
+  user_id TEXT NOT NULL,
+  season_year INTEGER NOT NULL,
+  cane_id TEXT NOT NULL,
+  claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, season_year, cane_id)
+);
+CREATE TABLE IF NOT EXISTS christmas_cosmetics (
+  user_id TEXT NOT NULL,
+  season_year INTEGER NOT NULL,
+  name_color TEXT NOT NULL DEFAULT '#e34b55',
+  badge TEXT NOT NULL DEFAULT 'christmas',
+  granted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, season_year)
+);
