@@ -22,62 +22,35 @@
 
   <!-- ===================== small xmas add-on ===================== -->
   <style id="xmas-theme">
-    /* Candy-cane border — primary button only, drawn as a 2px ring ON the button */
+    /* Candy-cane filled primary button with shadowed text */
     .xmas-candy {
-      position: relative;
+      background-color: #d42426 !important;
+      background-image: linear-gradient(45deg,
+        #d42426 25%, #ffffff 25%, #ffffff 50%,
+        #d42426 50%, #d42426 75%, #ffffff 75%) !important;
+      background-size: 28px 28px !important;
+      color: #fff !important;
+      text-shadow:
+        1px 1px 0 #7d0b0e,
+        -1px -1px 0 #7d0b0e,
+        1px -1px 0 #7d0b0e,
+        -1px 1px 0 #7d0b0e,
+        0 2px 4px rgba(0,0,0,0.35);
     }
-    .xmas-candy::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 2px;
-      background: repeating-linear-gradient(-45deg, #d42426 0 6px, #ffffff 6px 12px);
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-              mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-              mask-composite: exclude;
-      animation: xmas-candy-slide 0.9s linear infinite;
-      pointer-events: none;
-      box-sizing: border-box;
-    }
-    @keyframes xmas-candy-slide {
-      to { background-position: 17px 0; }
-    }
-
-    /* Small Santa hat — primary button only */
-    .xmas-hat {
-      position: relative;
-      overflow: visible !important;
-    }
-    .xmas-hat::after {
-      content: "";
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      width: 20px;
-      height: 18px;
-      transform: translateX(-50%) rotate(-8deg);
-      transform-origin: 60% 100%;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 36'%3E%3Cpath d='M6 27 Q10 6 28 5 Q27 18 36 27Z' fill='%23d42426'/%3E%3Crect x='3' y='24' width='35' height='9' rx='4.5' fill='%23fff'/%3E%3Ccircle cx='29' cy='6' r='5' fill='%23fff'/%3E%3C/svg%3E") center/contain no-repeat;
-      pointer-events: none;
-      z-index: 5;
-      transition: transform .25s cubic-bezier(.3,1.6,.5,1);
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));
-    }
-    .xmas-hat:not(:disabled):hover::after {
-      transform: translateX(-50%) rotate(4deg) translateY(-2px);
+    /* Keep the fill stable on interaction states */
+    .xmas-candy:hover,
+    .xmas-candy:focus,
+    .xmas-candy:active,
+    .xmas-candy:focus-visible {
+      background-color: #d42426 !important;
+      background-image: linear-gradient(45deg,
+        #d42426 25%, #ffffff 25%, #ffffff 50%,
+        #d42426 50%, #d42426 75%, #ffffff 75%) !important;
+      background-size: 28px 28px !important;
+      color: #fff !important;
     }
 
-    /* Santa GIF in the "loading / thinking" slot */
-    .xmas-santa-thinking {
-      width: 1.2em;
-      height: 1.2em;
-      object-fit: contain;
-      display: block;
-    }
-
-    /* Light snowfall */
+    /* Light snowfall — identical to the AI page */
     .xmas-snow {
       position: fixed;
       inset: 0;
@@ -101,7 +74,6 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .xmas-candy::before,
       .xmas-flake { animation: none !important; }
       .xmas-snow { display: none; }
     }
@@ -143,55 +115,15 @@
       return PRIMARY.test(labelOf(b));
     }
 
-    /* Only the primary/submit button gets candy-cane + hat */
     function decorateButtons() {
       document.querySelectorAll('button, [role="button"], input[type="submit"]').forEach(function (b) {
         if (b.dataset.xmasDone) return;
         b.dataset.xmasDone = '1';
-        if (isPrimary(b)) {
-          b.classList.add('xmas-candy', 'xmas-hat');
-        }
+        if (isPrimary(b)) b.classList.add('xmas-candy');
       });
     }
 
-    /* Replace loading spinner contents with santa.gif */
-    function decorateSpinner(el) {
-      if (!el) return;
-      if (el.tagName === 'svg') el = el.parentElement;
-      if (!el || el === document.body || el === document.documentElement) return;
-      if (el.querySelector('img.xmas-santa-thinking')) return;
-
-      Array.prototype.forEach.call(el.children, function (c) {
-        c.style.display = 'none';
-      });
-
-      var img = document.createElement('img');
-      img.src = '/pages/assets/santa.gif';
-      img.alt = 'Loading';
-      img.className = 'xmas-santa-thinking';
-      img.setAttribute('aria-hidden', 'true');
-      el.appendChild(img);
-
-      el.style.animation = 'none';
-      el.style.display = 'inline-flex';
-      el.style.alignItems = 'center';
-      el.style.justifyContent = 'center';
-    }
-
-    function findSpinners() {
-      document.querySelectorAll([
-        '.animate-spin',
-        '[role="status"]',
-        '[aria-label*="loading" i]',
-        '[aria-label*="thinking" i]',
-        '[data-testid*="loading" i]',
-        '[data-testid*="spinner" i]',
-        '[data-testid*="thinking" i]',
-        '[data-testid*="typing" i]'
-      ].join(', ')).forEach(decorateSpinner);
-    }
-
-    /* Light snowfall — a handful of slow flakes */
+    /* Light snowfall — identical to the AI page */
     (function makeSnow() {
       if (document.getElementById('xmas-snow-host')) return;
       if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -226,7 +158,6 @@
       requestAnimationFrame(function () {
         pending = false;
         decorateButtons();
-        findSpinners();
       });
     }
 
