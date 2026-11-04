@@ -22,13 +22,15 @@
 
   <!-- ===================== small xmas add-on ===================== -->
   <style id="xmas-theme">
-    /* Candy-cane filled primary button with shadowed text */
-    .xmas-candy {
+    /* Candy-cane fill + shadowed text — only for the big primary CTA. */
+    [data-xmas-candy] {
       background-color: #d42426 !important;
       background-image: linear-gradient(45deg,
         #d42426 25%, #ffffff 25%, #ffffff 50%,
         #d42426 50%, #d42426 75%, #ffffff 75%) !important;
       background-size: 28px 28px !important;
+      background-repeat: repeat !important;
+      background-position: 0 0;
       color: #fff !important;
       text-shadow:
         1px 1px 0 #7d0b0e,
@@ -36,21 +38,39 @@
         1px -1px 0 #7d0b0e,
         -1px 1px 0 #7d0b0e,
         0 2px 4px rgba(0,0,0,0.35);
+      /* JS owns background-position — keep it out of the transition list. */
+      transition:
+        color .2s,
+        background-color .2s,
+        border-color .2s,
+        box-shadow .2s,
+        opacity .2s,
+        transform .2s !important;
     }
-    /* Keep the fill stable on interaction states */
-    .xmas-candy:hover,
-    .xmas-candy:focus,
-    .xmas-candy:active,
-    .xmas-candy:focus-visible {
+    [data-xmas-candy]:hover,
+    [data-xmas-candy]:focus,
+    [data-xmas-candy]:focus-visible,
+    [data-xmas-candy]:active {
       background-color: #d42426 !important;
       background-image: linear-gradient(45deg,
         #d42426 25%, #ffffff 25%, #ffffff 50%,
         #d42426 50%, #d42426 75%, #ffffff 75%) !important;
       background-size: 28px 28px !important;
+      background-repeat: repeat !important;
       color: #fff !important;
     }
+    /* Honor disabled state — never disguise a disabled button as enabled. */
+    [data-xmas-candy]:disabled,
+    [data-xmas-candy][aria-disabled="true"] {
+      background-color: #9a9a9a !important;
+      background-image: none !important;
+      color: #e8e8e8 !important;
+      text-shadow: none !important;
+      cursor: not-allowed !important;
+      opacity: 0.65;
+    }
 
-    /* Light snowfall — identical to the AI page */
+    /* Light snowfall — identical to the AI page. */
     .xmas-snow {
       position: fixed;
       inset: 0;
@@ -96,37 +116,123 @@
   <!-- ===================== small xmas add-on script ===================== -->
   <script id="xmas-script">
   (function () {
-    var PRIMARY = /save|submit|confirm|continue|copy|redeem|claim|apply|update|sign.?in|log.?in|link|connect/i;
+    var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function labelOf(b) {
-      return [
-        b.getAttribute('aria-label') || '',
-        b.title || '',
-        b.id || '',
-        typeof b.className === 'string' ? b.className : '',
-        b.getAttribute('data-testid') || '',
-        (b.textContent || '').trim()
-      ].join(' ');
+    /* Buttons that must NEVER be candy-caned. */
+    var EXCLUDE = /\b(
+      sign.?in | sign.?out | sign.?up |
+      log.?in  | log.?out  |
+      create.?account | register |
+      forgot.?password | reset.?password |
+      cancel | back | delete | remove | close | dismiss |
+      copy | share | edit | change |
+      preferences | notification | privacy | security |
+      logout | leave | refund | report | block | unblock | mute | unmute
+    )\b/ix;
+
+    /* Phrases that clearly identify the "big" primary action. */
+    var BIG_CTA = /\b(
+      save(\s+changes)? | update | continue | proceed | confirm |
+      done | finish | complete | checkout | subscribe | upgrade |
+      start | get\s+started | submit | apply | accept | agree
+    )\b/ix;
+
+    function btnText(b) {
+      if (b.tagName === 'INPUT') return (b.value || '').trim();
+      return (b.textContent || '').trim();
     }
 
-    function isPrimary(b) {
-      if (b.type === 'submit') return true;
-      if (/\b(primary|btn-primary|button-primary)\b/i.test(typeof b.className === 'string' ? b.className : '')) return true;
-      return PRIMARY.test(labelOf(b));
+    function isBigPrimary(b) {
+      if (!b.isConnected) return false;
+
+      /* Skip form-controls that only *look* like buttons. */
+      if (b.type === 'checkbox' || b.type === 'radio') return false;
+      if (b.matches('[role="switch"], [role="checkbox"], [aria-pressed], [aria-checked]')) return false;
+
+      /* Icon-only buttons are not CTAs — skip to avoid making icons invisible. */
+      var text = btnText(b);
+      if (!text) return false;
+
+      var cls = typeof b.className === 'string' ? b.className : '';
+      var aria = b.getAttribute('aria-label') || '';
+      var haystack = text + ' ' + cls + ' ' + aria;
+
+      if (EXCLUDE.test(haystack)) return false;
+
+      /* Accept if it advertises itself as primary/cta… */
+      var hasPrimaryClass = /(^|[\s_-])(primary|cta|main)([\s_-]|$)/i.test(cls);
+      /* …or if the visible label is a clear big-CTA phrase. */
+      var hasBigText = BIG_CTA.test(text);
+
+      if (!hasPrimaryClass && !hasBigText) return false;
+
+      /* "Big" heuristic — skip tiny buttons. 0 = not measured yet, allow. */
+      var w = b.offsetWidth || (b.getBoundingClientRect ? b.getBoundingClientRect().width : 0);
+      if (w && w < 100) return false;
+
+      return true;
+    }
+
+    /* ---- Smooth candy-cane animation on the selected button ---- */
+    var states = new Map();
+    var running = false;
+    var MAX_SPEED = 0.7;
+    var SMOOTHING = 0.08;
+    var PERIOD = 28;
+
+    function ensureState(el) {
+      var s = states.get(el);
+      if (s) return s;
+      s = { x: 0, vel: 0, hover: false };
+      states.set(el, s);
+      el.addEventListener('mouseenter', function () { s.hover = true;  kick(); });
+      el.addEventListener('mouseleave', function () { s.hover = false; kick(); });
+      el.addEventListener('focus',      function () { s.hover = true;  kick(); });
+      el.addEventListener('blur',       function () { s.hover = false; kick(); });
+      return s;
+    }
+
+    function frame(now) {
+      var dt = Math.min(50, now - (frame._last || now)) / 16.67;
+      frame._last = now;
+      var any = false;
+
+      states.forEach(function (s, el) {
+        if (!el.isConnected) { states.delete(el); return; }
+        var target = s.hover ? MAX_SPEED : 0;
+        var k = 1 - Math.pow(1 - SMOOTHING, dt);
+        s.vel += (target - s.vel) * k;
+        if (Math.abs(s.vel) < 0.01 && !s.hover) s.vel = 0;
+        else any = true;
+        s.x += s.vel * dt;
+        if (s.x >= PERIOD) s.x -= PERIOD;
+        el.style.backgroundPosition = s.x.toFixed(2) + 'px 0';
+      });
+
+      if (any) requestAnimationFrame(frame);
+      else { running = false; frame._last = 0; }
+    }
+
+    function kick() {
+      if (running) return;
+      running = true;
+      frame._last = performance.now();
+      requestAnimationFrame(frame);
     }
 
     function decorateButtons() {
-      document.querySelectorAll('button, [role="button"], input[type="submit"]').forEach(function (b) {
-        if (b.dataset.xmasDone) return;
-        b.dataset.xmasDone = '1';
-        if (isPrimary(b)) b.classList.add('xmas-candy');
+      document.querySelectorAll('button, input[type="submit"]').forEach(function (b) {
+        if (b.hasAttribute('data-xmas-candy')) return;
+        if (!isBigPrimary(b)) return;
+        b.setAttribute('data-xmas-candy', '1');
+        ensureState(b);
       });
     }
 
-    /* Light snowfall — identical to the AI page */
+    /* ---- Snow — identical to the AI page ---- */
     (function makeSnow() {
+      if (reduced) return;
       if (document.getElementById('xmas-snow-host')) return;
-      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
       var host = document.createElement('div');
       host.id = 'xmas-snow-host';
@@ -155,10 +261,7 @@
     function tick() {
       if (pending) return;
       pending = true;
-      requestAnimationFrame(function () {
-        pending = false;
-        decorateButtons();
-      });
+      requestAnimationFrame(function () { pending = false; decorateButtons(); });
     }
 
     new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
